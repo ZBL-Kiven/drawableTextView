@@ -12,6 +12,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -609,7 +610,23 @@ public class DrawableTextView extends View {
         drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, r, false);
     }
 
+    /**
+     * V1.0.2 fixed
+     * When the Drawable type is XML filled, the Android ResourceImpl.loadDrawable method will use the ID as the cookies-Key cache,
+     * so that when select and replace point to the same ID directory,
+     * the obtained Bitmap source file address (non-object address) is the same, Therefore need to make a judgment or copy a new cache.
+     * example: ((BitmapDrawable) selectedDrawable).getBitmap() == ((BitmapDrawable) replaceDrawable).getBitmap()
+     */
     private void drawDrawables(Canvas canvas, Drawable select, Drawable replace, Rect rect, boolean drawAlways) {
+
+        //fixed v1.0.2
+        if (select instanceof BitmapDrawable && replace instanceof BitmapDrawable) {
+            if (((BitmapDrawable) select).getBitmap() == ((BitmapDrawable) replace).getBitmap()) {
+                drawDrawables(canvas, null, replace, rect, true);
+                return;
+            }
+        }
+
         if (select == null || replace == null) {
             if (select != null) {
                 select.setBounds(rect);
