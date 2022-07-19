@@ -1124,6 +1124,7 @@ public class DrawableTextView extends View {
 
     private void refreshAndValidate() {
         requestLayout();
+        postInvalidate();
     }
 
     public interface BadgeClickListener {
